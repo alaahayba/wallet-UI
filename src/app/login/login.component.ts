@@ -1,41 +1,60 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { HttpService } from '../http.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { first } from 'rxjs/operators';
 
-@Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
-})
+import { BackEndService, AlertService } from '../services';
+
+@Component({ templateUrl: 'login.component.html' })
 export class LoginComponent implements OnInit {
-  mobile: string = "tektutorialshub"
-  password: string = "tektutorialshub"
-  userName: any;
-  errorMessage: any;
-  contactForm: any;
+    form!: FormGroup;
+    loading = false;
+    submitted = false;
 
-  constructor(private serverRemote: HttpService) { }
+    constructor(
+        private formBuilder: FormBuilder,
+        private route: ActivatedRoute,
+        private router: Router,
+        private BackEndService: BackEndService,
+        private alertService: AlertService
+    ) { }
 
-  ngOnInit(): void {
-  }
-  
-  onSubmit() {
-    console.log('Your form data : ');
-}
+    ngOnInit() {
+        this.form = this.formBuilder.group({
+            mobile: ['', Validators.required],
+            password: ['', Validators.required]
+        });
+    }
 
-  public login() {
-    console.log("loginnnnn")
-    this.serverRemote.login(this.mobile, this.password)
-      .subscribe(
-        (response) => {                           //next() callback
-          console.log('response received')
-        },
-        (error) => {                              //error() callback
-          console.error('Request failed with error')
-          this.errorMessage = error;
-        },
-        () => {                                   //complete() callback
-          console.error('Request completed')      //This is actually not needed 
-        })
-  }
+    // convenience getter for easy access to form fields
+    get f() { return this.form.controls; }
+
+    onSubmit() {
+        this.submitted = true;
+
+        // reset alerts on submit
+        this.alertService.clear();
+
+        // stop here if form is invalid
+        if (this.form.invalid) {
+            return;
+        }
+
+        this.loading = true;
+        this.BackEndService.login(this.f['mobile'].value, this.f['password'].value)
+            .pipe(first())
+            .subscribe({
+                next: () => {
+                    console.log("inside next")
+                    // get return url from query parameters or default to home page
+                    const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/user';
+                    this.router.navigateByUrl(returnUrl);
+                },
+                error: error => {
+                    console.log("$$$$$$", error.error)
+                    this.alertService.error(error.error.message);
+                    this.loading = false;
+                }
+            });
+    }
 }
