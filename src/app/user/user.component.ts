@@ -48,12 +48,14 @@ export class UserComponent implements OnInit {
       this.BackEndService.transfer(this.f['mobile'].value, this.f['amount'].value)
           .pipe(first())
           .subscribe({
-              next: () => {
-                  console.log("inside next")
+              next: (data) => {
+                  console.log("inside next", data , Object.keys(data))
                   // get return url from query parameters or default to home page
-                  const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/user';
-                  this.router.navigateByUrl(returnUrl);
+                  this.alertService.success(data.msessage);
+                  //const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/user';
+                  //this.router.navigateByUrl(returnUrl);
                   this.loading = false;
+
 
               },
               error: error => {

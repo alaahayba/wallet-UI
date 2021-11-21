@@ -26,7 +26,6 @@ export class BackEndService {
     }
 
     login(mobile: any, password: any) {
-        console.log(">>>>>>>>>>.", mobile, password);
         return this.http.post<User>(`${environment.apiUrl}/login`,
             { mobile, password })
             .pipe(map(user => {
@@ -43,7 +42,7 @@ export class BackEndService {
                 .set('token', this.userValue.token|| "")
         }
         console.log(">>>>>>>>>>.", mobile, amount, "$$$$$", this.user);
-        return this.http.post<User>(`${environment.apiUrl}/user/transaction/execute`,
+        return this.http.post<any>(`${environment.apiUrl}/user/transaction/execute`,
             { destination : mobile, amount }, header)
             .pipe(map(data => {
                 console.log(">>>>>transfer>>>>>.", data)
