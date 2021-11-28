@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:3001'
+  apiUrl: `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}`
 
 };
