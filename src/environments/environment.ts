@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}`
+  apiUrl: `http://localhost:3000`
 
 };
 
